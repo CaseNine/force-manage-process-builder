@@ -1,0 +1,17 @@
+{
+  "name": "clean-salesforce-proces-builder",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name" : "Theodoor van Donge",
+    "email" : "theodoorvandonge@casenine.com"
+  },
+  "license": "",
+  "dependencies": {
+    "selenium-webdriver": "^2.46.1"
+  }
+}
