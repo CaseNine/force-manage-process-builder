@@ -52,7 +52,7 @@ webdriver.promise.consume(function * exec() {
     });
   };
 
-  let tableRow = driver.findElement(activeRowLocator);
+  let tableRow = yield driver.findElement(activeRowLocator);
 
 
   let deactivateButton = By.css('button.activate');
@@ -87,7 +87,7 @@ webdriver.promise.consume(function * exec() {
 
     try {
       tableRow = driver.findElement(activeRowLocator);
-      if (!tableRow.isElementPresent() || !tableRow.isDisplayed()) {
+      if (!driver.isElementPresent(activeRowLocator) || !tableRow.isDisplayed()) {
         console.log('no table row anymore');
         tableRow = null;
         break;

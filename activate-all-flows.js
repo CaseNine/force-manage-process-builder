@@ -11,7 +11,7 @@ let driver = new webdriver.Builder()
     .forBrowser('firefox')
     .build();
 
-yield webdriver.promise.consume(function * exec() {
+webdriver.promise.consume(function * exec() {
 
   yield driver.get('https://login.salesforce.com');
 
@@ -39,13 +39,30 @@ yield webdriver.promise.consume(function * exec() {
   yield driver.wait(until.elementLocated(By.id('label')));
 
   // open flows
-  var openFlowButtonLocator = By.css('table tbody td.label a:nth-child(2)');
-  let openFlowButton = driver.findElement(openFlowButtonLocator);
+  //var openFlowButtonLocator = By.css('table tbody td.label a:nth-child(2)');
+  // open flows
+  let openFlowButtonLocator = By.css('td.label a:nth-child(2)');
+  let statusColumnLocator = By.css('td.status[title="Inactief"]');
+  let tableRowLocator = By.css('tr.processuimgntConsoleListRow');
+  //let openFlowButton = driver.findElement(openFlowButtonLocator);
+
+  let inactiveRowLocator = function () {
+    let tableRowElement = driver.findElements(tableRowLocator);
+    return webdriver.promise.filter(tableRowElement, function (row) {
+      return row.isElementPresent(statusColumnLocator);
+    }).then(function (activeRows) {
+      return activeRows[0];
+    });
+  };
+
+  let tableRow = yield driver.findElement(inactiveRowLocator);
 
   console.log('start generator function');
-  while(openFlowButton) {
+  while(tableRow) {
 
     console.log('while try 11212');
+
+    let openFlowButton = tableRow.findElement(openFlowButtonLocator);
 
     yield openFlowButton.click();
 
@@ -57,6 +74,7 @@ yield webdriver.promise.consume(function * exec() {
     // click OK confirm button
     let OKbutton = By.css('.dialog:not(.hidden) .buttons button.saveButton');
     yield driver.wait(until.elementLocated(OKbutton), 10000);
+    yield driver.findElement(OKbutton).click();
 
     //driver.wait(function () {
     //  let OKbutton = By.css('button.saveButton');
@@ -66,7 +84,7 @@ yield webdriver.promise.consume(function * exec() {
 
 
     // click back button, back to list view
-    yield driver.sleep(3000);
+    yield driver.sleep(2000);
     let backButton = By.css('button.back');
     yield driver.wait(until.elementLocated(backButton));
     yield driver.findElement(backButton).click();
@@ -75,18 +93,15 @@ yield webdriver.promise.consume(function * exec() {
     console.info('activated one');
 
     try {
-      openFlowButton = driver.findElement(openFlowButtonLocator);
-
-      if (!openFlowButton.isElementPresent() || !openFlowButton.isDisplayed()) {
-        console.log('no dropdown anymore');
-        openFlowButton = null;
+      tableRow = driver.findElement(inactiveRowLocator);
+      if (!driver.isElementPresent(inactiveRowLocator) || !tableRow.isDisplayed()) {
+        console.log('no table row anymore');
+        tableRow = null;
         break;
       }
-
-
     } catch(err) {
       console.error('error:', err);
-      openFlowButton = null;
+      tableRow = null;
       break;
     }
   }

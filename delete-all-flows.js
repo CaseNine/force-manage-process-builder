@@ -4,8 +4,8 @@ let webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;
 
-let sfUsername = process.env.SF_USERNAME;
-let sfPassword = process.env.SF_PASSWORD;
+let sfUsername = process.env.SF_USERNAME,
+    sfPassword = process.env.SF_PASSWORD;
 
 let driver = new webdriver.Builder()
     .forBrowser('firefox')
@@ -39,7 +39,8 @@ webdriver.promise.consume(function * exec() {
   //
   yield driver.wait(until.elementLocated(By.id('label')));
   // delete flows
-  let dropdown = driver.findElement(By.css('table tbody td.label a:nth-child(1)'));
+  var dropdownLocator = By.css('table tbody td.label a:nth-child(1)');
+  let dropdown = driver.findElement(dropdownLocator);
 
   console.log('start generator function');
   while(dropdown) {
@@ -69,9 +70,9 @@ webdriver.promise.consume(function * exec() {
     console.info('deleted one');
 
     try {
-      dropdown = driver.findElement(By.css('table tbody td.label a:nth-child(1)'));
+      dropdown = driver.findElement(dropdownLocator);
 
-      if (!dropdown.isElementPresent() || !dropdown.isDisplayed()) {
+      if (!driver.isElementPresent(dropdownLocator) || !dropdown.isDisplayed()) {
         console.log('no dropdown anymore');
         dropdown = null;
         break;
