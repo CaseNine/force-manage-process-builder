@@ -4,11 +4,12 @@ let webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;
 
-let sfUsername = process.env.SF_USERNAME,
-    sfPassword = process.env.SF_PASSWORD;
+let sfUsername = process.env.SF_USERNAME;
+let sfPassword = process.env.SF_PASSWORD;
+let browser = process.env.BROWSER;
 
 let driver = new webdriver.Builder()
-    .forBrowser('firefox')
+    .forBrowser(browser)
     .build();
 
 webdriver.promise.consume(function * exec() {
