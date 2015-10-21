@@ -10,6 +10,8 @@ exports.fetchEmailServiceAddresses = fetchEmailServiceAddresses;
 exports.createEmailServiceAddress = createEmailServiceAddress;
 exports.createEmailService = createEmailService;
 exports.fetchApexClassByName = fetchApexClassByName;
+exports.fetchCronTriggers = fetchCronTriggers;
+exports.fetchCronTriggersByName = fetchCronTriggersByName;
 
 
 let webdriver = require('selenium-webdriver'),
@@ -41,9 +43,32 @@ function * createScheduledApexWithJsforce(jsforceConn, class_, cronExpr) {
     throw resultSchedule;
   }
 
-  let cronTriggers = yield jsforceConn.query('SELECT Id FROM CronTrigger ORDER BY CreatedDate DESC LIMIT 1');
+  let cronTriggers = yield * fetchCronTriggers(jsforceConn);
   return cronTriggers.records[0];
 }
+
+/**
+ * @param {jsforce.Connection} jsforceConn
+ */
+function * fetchCronTriggers(jsforceConn) {
+  return yield jsforceConn.query(`
+      SELECT Id, CronJobDetail.Id, CronJobDetail.Name, CronJobDetail.JobType
+      FROM CronTrigger`);
+}
+
+/**
+ * @param {jsforce.Connection} jsforceConn
+ * @param {string} jobName
+ * @returns {Array.<Record>}
+ */
+function * fetchCronTriggersByName(jsforceConn, jobName) {
+  //CronJobDetail
+  return (yield jsforceConn.query(`
+      SELECT Id, CronJobDetail.Id, CronJobDetail.Name, CronJobDetail.JobType
+      FROM CronTrigger
+      WHERE CronJobDetail.Name = ${jobName}`)).records;
+}
+
 
 /**
  * @param {jsforce.Connection} jsforceConn
