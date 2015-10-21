@@ -28,7 +28,7 @@ function * activateMeetdataverwachtScheduledApex(jsforceConn) {
 function * deactivateMeetdataverwachtScheduledApex(jsforceConn) {
   try {
     yield jsforceConn.login(sfUsername, sfPassword);
-    let cronTriggers = (yield * navigate.fetchCronTriggersByName(jsforceConn, 'auto scheduled job CreateMeetdataVerwacht')).records;
+    let cronTriggers = yield * navigate.fetchCronTriggersByName(jsforceConn, 'auto scheduled job CreateMeetdataVerwacht');
 
     for (let cronTrigger of cronTriggers) {
       let removeScheduleResult = yield * navigate.removeScheduledApexWithJsforce(jsforceConn, cronTrigger.Id);
