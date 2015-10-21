@@ -7,11 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": {
-    "name" : "Theodoor van Donge",
-    "email" : "theodoorvandonge@casenine.com"
+    "name": "Theodoor van Donge",
+    "email": "theodoorvandonge@casenine.com"
   },
   "license": "",
   "dependencies": {
-    "selenium-webdriver": "^2.46.1"
+    "jsforce": "^1.5.0",
+    "selenium-webdriver": "^2.46.1",
+    "yargs": "^3.27.0"
   }
 }
