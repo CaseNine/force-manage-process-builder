@@ -27,7 +27,6 @@ function * activateMeetdataverwachtScheduledApex(jsforceConn) {
 
 function * deactivateMeetdataverwachtScheduledApex(jsforceConn) {
   try {
-    yield jsforceConn.login(sfUsername, sfPassword);
     let cronTriggers = yield * navigate.fetchCronTriggersByName(jsforceConn, 'auto scheduled job CreateMeetdataVerwacht');
 
     for (let cronTrigger of cronTriggers) {
@@ -44,8 +43,6 @@ function * deactivateMeetdataverwachtScheduledApex(jsforceConn) {
 
 function * removeEmailServices(jsforceConn) {
   try {
-    yield jsforceConn.login(sfUsername, sfPassword);
-
     let addresses = yield * navigate.fetchEmailServiceAddresses(jsforceConn);
     let addressIds = addresses.map(address => address.Id);
     let deleteAdressesResult = yield jsforceConn.sobject('EmailServicesAddress').destroy(addressIds);
@@ -65,8 +62,6 @@ function * removeEmailServices(jsforceConn) {
 
 function * insertEmailServiceAddress(jsforceConn) {
   try {
-    yield jsforceConn.login(sfUsername, sfPassword);
-
     let classId = (yield * navigate.fetchApexClassByName(jsforceConn, 'InboundEmailInhuizingsAanvraagService')).Id;
     let serviceResult = yield * navigate.createEmailService(jsforceConn, classId);
     console.log('serviceResult', serviceResult);
