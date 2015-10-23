@@ -6,6 +6,7 @@ let webdriver = require('selenium-webdriver'),
 
 let sfUsername = process.env.SF_USERNAME;
 let sfPassword = process.env.SF_PASSWORD;
+let sfLoginUrl = process.env.SF_LOGIN_URL;
 let browser = process.env.BROWSER;
 
 let driver = new webdriver.Builder()
@@ -14,7 +15,7 @@ let driver = new webdriver.Builder()
 
 webdriver.promise.consume(function * exec() {
 
-  yield driver.get('https://login.salesforce.com');
+  yield driver.get(sfLoginUrl);
 
   // Login
   yield driver.findElement(By.id('username')).sendKeys(sfUsername);

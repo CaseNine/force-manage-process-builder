@@ -236,9 +236,10 @@ function * createScheduledApex(driver, class_) {
  * @param {webdriver.WebDriver} driver
  * @param {string} username
  * @param {string} password
+ * @param {string} loginUrl
  */
-function * login(driver, username, password) {
-  yield driver.get('https://login.salesforce.com');
+function * login(driver, username, password, loginUrl) {
+  yield driver.get(loginUrl);
 
   // Login
   yield driver.findElement(By.id('username')).sendKeys(username);
