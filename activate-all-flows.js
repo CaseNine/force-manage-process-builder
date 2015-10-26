@@ -3,6 +3,7 @@
 let webdriver = require('selenium-webdriver'),
     By = webdriver.By,
     until = webdriver.until;
+let url = require('url');
 
 let sfUsername = process.env.SF_USERNAME;
 let sfPassword = process.env.SF_PASSWORD;
@@ -25,17 +26,11 @@ webdriver.promise.consume(function * exec() {
   // Open proces builder
   yield driver.wait(until.elementLocated(By.id('setupSearch')));
 
-  var DevTools_icon = By.id('DevTools_icon');
-  yield driver.wait(until.elementLocated(DevTools_icon));
-  yield driver.findElement(DevTools_icon).click();
+  let currentUrl = yield driver.getCurrentUrl();
+  let currentUrlParsed = url.parse(currentUrl);
 
-  var Workflow_icon = By.id('Workflow_icon');
-  yield driver.wait(until.elementLocated(Workflow_icon));
-  yield driver.findElement(Workflow_icon).click();
+  yield driver.get(`${currentUrlParsed.protocol}://${currentUrlParsed.hostname}/processui/processui.app`);
 
-  var ProcessAutomation_font = By.id('ProcessAutomation_font');
-  yield driver.wait(until.elementLocated(ProcessAutomation_font));
-  yield driver.findElement(ProcessAutomation_font).click();
 
   // Wait while the proces builder page loads
   yield driver.wait(until.elementLocated(By.id('label')));
