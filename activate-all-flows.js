@@ -24,12 +24,14 @@ webdriver.promise.consume(function * exec() {
   yield driver.findElement(By.id('Login')).click();
 
   // Open proces builder
-  yield driver.wait(until.elementLocated(By.id('setupSearch')));
+  yield driver.wait(until.elementLocated(By.id('toolbar')));
 
   let currentUrl = yield driver.getCurrentUrl();
   let currentUrlParsed = url.parse(currentUrl);
 
-  yield driver.get(`${currentUrlParsed.protocol}://${currentUrlParsed.hostname}/processui/processui.app`);
+  console.log('url proces builder', `${currentUrlParsed.protocol}//${currentUrlParsed.hostname}/processui/processui.app`);
+
+  yield driver.get(`${currentUrlParsed.protocol}//${currentUrlParsed.hostname}/processui/processui.app`);
 
 
   // Wait while the proces builder page loads
@@ -55,7 +57,7 @@ webdriver.promise.consume(function * exec() {
   let tableRow = yield driver.findElement(inactiveRowLocator);
 
   console.log('start generator function');
-  while(tableRow) {
+  while (tableRow) {
 
     console.log('while try 11212');
 
@@ -84,25 +86,40 @@ webdriver.promise.consume(function * exec() {
     yield driver.sleep(2000);
     let backButton = By.css('button.back');
     yield driver.wait(until.elementLocated(backButton));
+    yield driver.wait(elemIsVisible(backButton));
     yield driver.findElement(backButton).click();
 
     yield driver.sleep(1000);
     console.info('activated one');
 
     try {
+      // Wait while the proces builder page loads
+      yield driver.wait(until.elementLocated(By.id('label')));
+      yield driver.wait(elemIsVisible(By.id('label')));
+
       tableRow = driver.findElement(inactiveRowLocator);
       if (!driver.isElementPresent(inactiveRowLocator) || !tableRow.isDisplayed()) {
         console.log('no table row anymore');
         tableRow = null;
         break;
       }
-    } catch(err) {
+    } catch (err) {
       console.error('error:', err);
       tableRow = null;
       break;
     }
   }
 
-});
+}).then(result => console.log('done', arguments), err => console.error(err, arguments));
 
-console.log('done');
+
+function elemIsVisible(locator) {
+  return new until.Condition('wait for visible of elem', function(_driver) {
+    try {
+      _driver.findElement(locator);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  });
+}
