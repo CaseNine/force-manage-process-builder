@@ -85,6 +85,5 @@ webdriver.promise.consume(function * exec() {
     }
   }
 
-});
+}).then(result => console.log('done', arguments), err => console.error(err, arguments));
 
-console.log('done');

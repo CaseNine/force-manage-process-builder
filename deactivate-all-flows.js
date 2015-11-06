@@ -24,12 +24,13 @@ webdriver.promise.consume(function * exec() {
   yield driver.findElement(By.id('Login')).click();
 
   // Open proces builder
-  yield driver.wait(until.elementLocated(By.id('setupSearch')));
+  yield driver.wait(until.elementLocated(By.id('toolbar')));
 
   let currentUrl = yield driver.getCurrentUrl();
   let currentUrlParsed = url.parse(currentUrl);
 
-  yield driver.get(`${currentUrlParsed.protocol}://${currentUrlParsed.hostname}/processui/processui.app`);
+  console.log('url proces builder', `${currentUrlParsed.protocol}//${currentUrlParsed.hostname}/processui/processui.app`);
+  yield driver.get(`${currentUrlParsed.protocol}//${currentUrlParsed.hostname}/processui/processui.app`);
 
   // Wait while the proces builder page loads
   yield driver.wait(until.elementLocated(By.id('label')));
@@ -82,6 +83,10 @@ webdriver.promise.consume(function * exec() {
     console.info('deactivated one');
 
     try {
+      // Wait while the proces builder page loads
+      yield driver.wait(until.elementLocated(By.id('label')));
+      yield driver.wait(elemIsVisible(By.id('label')));
+
       tableRow = driver.findElement(activeRowLocator);
       if (!driver.isElementPresent(activeRowLocator) || !tableRow.isDisplayed()) {
         console.log('no table row anymore');
@@ -95,6 +100,16 @@ webdriver.promise.consume(function * exec() {
     }
   }
 
-});
+}).then(result => console.log('done', arguments), err => console.error(err, arguments));
 
-console.log('done');
+
+function elemIsVisible(locator) {
+  return new until.Condition('wait for visible of elem', function(_driver) {
+    try {
+      _driver.findElement(locator);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  });
+}
