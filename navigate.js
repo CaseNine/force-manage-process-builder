@@ -138,6 +138,22 @@ export async function fetchEmailServiceAddresses(jsforceConn) {
   return (await jsforceConn.query(q)).records;
 }
 
+
+/**
+ * @param {jsforce.Connection} jsforceConn
+ * @param {string} functionId
+ * @returns {Array.<Record>}
+ */
+export async function fetchEmailServiceAddressesByFunctionId(jsforceConn, functionId) {
+  let q = `
+      SELECT AuthorizedSenders,CreatedById,CreatedDate,EmailDomainName,FunctionId,Id,IsActive,LastModifiedById,
+          LastModifiedDate,LocalPart,RunAsUserId,SystemModstamp
+      FROM EmailServicesAddress
+      WHERE FunctionId = '${functionId}'`;
+
+  return (await jsforceConn.query(q)).records;
+}
+
 /**
  * @param {jsforce.Connection} jsforceConn
  * @param classId
