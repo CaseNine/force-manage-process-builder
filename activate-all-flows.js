@@ -1,9 +1,11 @@
 "use strict";
 
-let webdriver = require('selenium-webdriver'),
-    By = webdriver.By,
+import * as webdriver from 'selenium-webdriver';
+import * as url from 'url';
+import { login, openLightningProcessBuilder, elemIsVisible } from 'navigate';
+
+let By = webdriver.By,
     until = webdriver.until;
-let url = require('url');
 
 let sfUsername = process.env.SF_USERNAME;
 let sfPassword = process.env.SF_PASSWORD;
@@ -14,28 +16,13 @@ let driver = new webdriver.Builder()
     .forBrowser(browser)
     .build();
 
-webdriver.promise.consume(function * exec() {
-
-  yield driver.get(sfLoginUrl);
+(async function () {
 
   // Login
-  yield driver.findElement(By.id('username')).sendKeys(sfUsername);
-  yield driver.findElement(By.id('password')).sendKeys(sfPassword);
-  yield driver.findElement(By.id('Login')).click();
+  await login(driver, sfUsername, sfPassword, sfLoginUrl);
 
   // Open proces builder
-  yield driver.wait(until.elementLocated(By.id('toolbar')));
-
-  let currentUrl = yield driver.getCurrentUrl();
-  let currentUrlParsed = url.parse(currentUrl);
-
-  console.log('url proces builder', `${currentUrlParsed.protocol}//${currentUrlParsed.hostname}/processui/processui.app`);
-
-  yield driver.get(`${currentUrlParsed.protocol}//${currentUrlParsed.hostname}/processui/processui.app`);
-
-
-  // Wait while the proces builder page loads
-  yield driver.wait(until.elementLocated(By.id('label')));
+  await openLightningProcessBuilder(driver);
 
   // open flows
   //var openFlowButtonLocator = By.css('table tbody td.label a:nth-child(2)');
@@ -54,7 +41,7 @@ webdriver.promise.consume(function * exec() {
     });
   };
 
-  let tableRow = yield driver.findElement(inactiveRowLocator);
+  let tableRow = await driver.findElement(inactiveRowLocator);
 
   console.log('start generator function');
   while (tableRow) {
@@ -63,39 +50,39 @@ webdriver.promise.consume(function * exec() {
 
     let openFlowButton = tableRow.findElement(openFlowButtonLocator);
 
-    yield openFlowButton.click();
+    await openFlowButton.click();
 
     // click delete button
     let activateButton = By.css('button.activate');
-    yield driver.wait(until.elementLocated(activateButton));
-    yield driver.findElement(activateButton).click();
+    await driver.wait(until.elementLocated(activateButton));
+    await driver.findElement(activateButton).click();
 
     // click OK confirm button
     let OKbutton = By.css('.dialog:not(.hidden) .buttons button.saveButton');
-    yield driver.wait(until.elementLocated(OKbutton), 10000);
-    yield driver.findElement(OKbutton).click();
+    await driver.wait(until.elementLocated(OKbutton), 10000);
+    await driver.findElement(OKbutton).click();
 
     //driver.wait(function () {
     //  let OKbutton = By.css('button.saveButton');
     //  return driver.findElement(OKbutton).isDisplayed();
     //}, 10000);
-    //yield driver.sleep(3000);
+    //await driver.sleep(3000);
 
 
     // click back button, back to list view
-    yield driver.sleep(2000);
+    await driver.sleep(2000);
     let backButton = By.css('button.back');
-    yield driver.wait(until.elementLocated(backButton));
-    yield driver.wait(elemIsVisible(backButton));
-    yield driver.findElement(backButton).click();
+    await driver.wait(until.elementLocated(backButton));
+    await driver.wait(elemIsVisible(backButton));
+    await driver.findElement(backButton).click();
 
-    yield driver.sleep(1000);
+    await driver.sleep(1000);
     console.info('activated one');
 
     try {
       // Wait while the proces builder page loads
-      yield driver.wait(until.elementLocated(By.id('label')));
-      yield driver.wait(elemIsVisible(By.id('label')));
+      await driver.wait(until.elementLocated(By.id('label')));
+      await driver.wait(elemIsVisible(By.id('label')));
 
       tableRow = driver.findElement(inactiveRowLocator);
       if (!driver.isElementPresent(inactiveRowLocator) || !tableRow.isDisplayed()) {
@@ -110,16 +97,6 @@ webdriver.promise.consume(function * exec() {
     }
   }
 
-}).then(result => console.log('done', arguments), err => console.error(err, arguments));
+  console.log('done');
 
-
-function elemIsVisible(locator) {
-  return new until.Condition('wait for visible of elem', function(_driver) {
-    try {
-      _driver.findElement(locator);
-      return true;
-    } catch (err) {
-      return false;
-    }
-  });
-}
+})();

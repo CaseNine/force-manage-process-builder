@@ -1,9 +1,11 @@
 "use strict";
 
-let webdriver = require('selenium-webdriver'),
-    By = webdriver.By,
+import * as webdriver from 'selenium-webdriver';
+import * as url from 'url';
+import { login, openLightningProcessBuilder, elemIsVisible } from 'navigate';
+
+let By = webdriver.By,
     until = webdriver.until;
-let url = require('url');
 
 let sfUsername = process.env.SF_USERNAME;
 let sfPassword = process.env.SF_PASSWORD;
@@ -14,31 +16,14 @@ let driver = new webdriver.Builder()
     .forBrowser(browser)
     .build();
 
-webdriver.promise.consume(function * exec() {
-
-  yield driver.get(sfLoginUrl);
+(async function () {
 
   // Login
-  yield driver.findElement(By.id('username')).sendKeys(sfUsername);
-  yield driver.findElement(By.id('password')).sendKeys(sfPassword);
-  yield driver.findElement(By.id('Login')).click();
+  await login(driver, sfUsername, sfPassword, sfLoginUrl);
 
   // Open proces builder
-  yield driver.wait(until.elementLocated(By.id('setupSearch')));
+  await openLightningProcessBuilder(driver);
 
-  let DevTools_icon = By.id('DevTools_icon');
-  let Workflow_icon = By.id('Workflow_icon');
-  let ProcessAutomation_font = By.id('ProcessAutomation_font');
-
-  yield driver.wait(until.elementLocated(DevTools_icon));
-
-  let currentUrl = yield driver.getCurrentUrl();
-  let currentUrlParsed = url.parse(currentUrl);
-
-  yield driver.get(`${currentUrlParsed.protocol}://${currentUrlParsed.hostname}/processui/processui.app`);
-
-  //
-  yield driver.wait(until.elementLocated(By.id('label')));
   // delete flows
   var dropdownLocator = By.css('table tbody td.label a:nth-child(1)');
   let dropdown = driver.findElement(dropdownLocator);
@@ -48,25 +33,25 @@ webdriver.promise.consume(function * exec() {
 
     console.log('while try 11212');
 
-    yield dropdown.click();
+    await dropdown.click();
 
     // click delete button
     let deleteButton = By.css('table tbody tr.bodyRow.processuimgntVersionListRow td.col.action a');
-    yield driver.wait(until.elementLocated(deleteButton));
-    yield driver.findElement(deleteButton).click();
+    await driver.wait(until.elementLocated(deleteButton));
+    await driver.findElement(deleteButton).click();
 
     // click OK confirm button
     let OKbutton = By.css('.dialog:not(.hidden) .buttons button.saveButton');
-    yield driver.wait(until.elementLocated(OKbutton), 10000);
+    await driver.wait(until.elementLocated(OKbutton), 10000);
 
     //driver.wait(function () {
     //  let OKbutton = By.css('button.saveButton');
     //  return driver.findElement(OKbutton).isDisplayed();
     //}, 10000);
-    yield driver.sleep(1000);
+    await driver.sleep(1000);
 
-    yield driver.findElement(OKbutton).click();
-    yield driver.sleep(2000);
+    await driver.findElement(OKbutton).click();
+    await driver.sleep(2000);
 
     console.info('deleted one');
 
@@ -85,5 +70,6 @@ webdriver.promise.consume(function * exec() {
     }
   }
 
-}).then(result => console.log('done', arguments), err => console.error(err, arguments));
+  console.log('done');
 
+})();
