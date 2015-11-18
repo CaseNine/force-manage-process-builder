@@ -4,9 +4,8 @@ import * as webdriver from 'selenium-webdriver';
 import * as jsforce from 'jsforce';
 import * as url from 'url';
 
-let By = webdriver.By,
-    until = webdriver.until;
-
+let By = webdriver.By;
+let until = webdriver.until;
 
 /**
  * @param {webdriver.WebDriver} driver
@@ -57,7 +56,6 @@ export async function fetchCronTriggersByName(jsforceConn, jobName) {
       WHERE CronJobDetail.Name = ${jobName}`)).records;
 }
 
-
 /**
  * @param {jsforce.Connection} jsforceConn
  * @param {string} jobId
@@ -72,7 +70,6 @@ export async function removeScheduledApexWithJsforce(jsforceConn, jobId) {
   }
   return resultAbort;
 }
-
 
 /**
  * @param {jsforce.Connection} jsforceConn
@@ -90,7 +87,6 @@ export async function fetchApexClassByName(jsforceConn, className) {
   return classResult[0];
 }
 
-
 /**
  * @param {jsforce.Connection} jsforceConn
  * @param {string} className
@@ -99,9 +95,12 @@ export async function fetchApexClassByName(jsforceConn, className) {
 export async function fetchEmailServicesByClassName(jsforceConn, className) {
   let class_ = await fetchApexClassByName(jsforceConn, className);
 
-  let q = `SELECT AddressInactiveAction,ApexClassId,AttachmentOption,AuthenticationFailureAction,AuthorizationFailureAction,AuthorizedSenders,CreatedById,CreatedDate,ErrorRoutingAddress,FunctionInactiveAction,FunctionName,Id,IsActive,IsAuthenticationRequired,IsErrorRoutingEnabled,IsTextAttachmentsAsBinary,IsTlsRequired,LastModifiedById,LastModifiedDate,OverLimitAction,SystemModstamp
+  let q = `SELECT AddressInactiveAction,ApexClassId,AttachmentOption,AuthenticationFailureAction,
+      AuthorizationFailureAction,AuthorizedSenders,CreatedById,CreatedDate,ErrorRoutingAddress,FunctionInactiveAction,
+      FunctionName,Id,IsActive,IsAuthenticationRequired,IsErrorRoutingEnabled,IsTextAttachmentsAsBinary,IsTlsRequired,
+      LastModifiedById,LastModifiedDate,OverLimitAction,SystemModstamp
   FROM EmailServicesFunction
-  WHERE ApexClassId = ${class_.Id}}`;
+  WHERE ApexClassId = '${class_.Id}'`;
 
   let emailServicesResult = (await jsforceConn.query(q)).records;
   if (emailServicesResult.length < 1) {
@@ -111,14 +110,16 @@ export async function fetchEmailServicesByClassName(jsforceConn, className) {
   return emailServicesResult[0];
 }
 
-
 /**
  * @param {jsforce.Connection} jsforceConn
  * @returns {Array.<Record>}
  */
 export async function fetchEmailServices(jsforceConn) {
   let q = `
-      SELECT AddressInactiveAction,ApexClassId,AttachmentOption,AuthenticationFailureAction,AuthorizationFailureAction,AuthorizedSenders,CreatedById,CreatedDate,ErrorRoutingAddress,FunctionInactiveAction,FunctionName,Id,IsActive,IsAuthenticationRequired,IsErrorRoutingEnabled,IsTextAttachmentsAsBinary,IsTlsRequired,LastModifiedById,LastModifiedDate,OverLimitAction,SystemModstamp
+      SELECT AddressInactiveAction,ApexClassId,AttachmentOption,AuthenticationFailureAction,AuthorizationFailureAction,
+          AuthorizedSenders,CreatedById,CreatedDate,ErrorRoutingAddress,FunctionInactiveAction,FunctionName,Id,IsActive,
+          IsAuthenticationRequired,IsErrorRoutingEnabled,IsTextAttachmentsAsBinary,IsTlsRequired,LastModifiedById,
+          LastModifiedDate,OverLimitAction,SystemModstamp
       FROM EmailServicesFunction`;
 
   return (await jsforceConn.query(q)).records;
@@ -130,7 +131,8 @@ export async function fetchEmailServices(jsforceConn) {
  */
 export async function fetchEmailServiceAddresses(jsforceConn) {
   let q = `
-      SELECT AuthorizedSenders,CreatedById,CreatedDate,EmailDomainName,FunctionId,Id,IsActive,LastModifiedById,LastModifiedDate,LocalPart,RunAsUserId,SystemModstamp
+      SELECT AuthorizedSenders,CreatedById,CreatedDate,EmailDomainName,FunctionId,Id,IsActive,LastModifiedById,
+          LastModifiedDate,LocalPart,RunAsUserId,SystemModstamp
       FROM EmailServicesAddress`;
 
   return (await jsforceConn.query(q)).records;
@@ -185,7 +187,6 @@ export async function createEmailServiceAddress(jsforceConn, emailServiceId) {
   return await jsforceConn.sobject('EmailServicesAddress').insert(address);
 }
 
-
 /**
  * @param {webdriver.WebDriver} driver
  * @param {string} class_
@@ -216,9 +217,9 @@ export async function createScheduledApex(driver, class_) {
   await dropdown.click();
   await dropdown.findElement(By.css('option[value=\'0:00\']')).click();
 
-  await driver.findElement(By.css('form[action=\'/ui/setup/apex/batch/ScheduleBatchApexPage?setupid=ScheduledJobs\']')).submit();
+  await driver.findElement(By.css('form[action=\'/ui/setup/apex/batch/ScheduleBatchApexPage?setupid=ScheduledJobs\']'))
+      .submit();
 }
-
 
 /**
  * @param {webdriver.WebDriver} driver
