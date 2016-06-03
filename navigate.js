@@ -284,7 +284,7 @@ export async function getInstanceUrl(driver) {
  * @param {string} sobjectName
  */
 export async function openSObjectTab(driver, sobjectName) {
-  await driver.findElement(By.css(`.wt-${sobjectName} a`)).click();
+  await driver.findElement(By.css(`.wt-${sobjectName.replace('__c', '')} a`)).click();
 }
 
 /**
