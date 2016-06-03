@@ -280,6 +280,14 @@ export async function getInstanceUrl(driver) {
 }
 
 /**
+ * @param {webdriver.WebDriver} driver
+ * @param {string} sobjectName
+ */
+export async function openSObjectTab(driver, sobjectName) {
+  await driver.findElement(By.css(`.wt-${sobjectName} a`)).click();
+}
+
+/**
  * @param {webdriver.Locator} locator
  * @returns {webdriver.until.Condition}
  */
